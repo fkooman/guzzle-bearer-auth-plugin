@@ -2,18 +2,18 @@
 
 namespace fkooman\Guzzle\Plugin\BearerAuth;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Guzzle\Common\Event;
+use Guzzle\Http\Exception\BadResponseException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use fkooman\Guzzle\Plugin\BearerAuth\Exception\BearerErrorResponseException;
 
 class BearerAuth implements EventSubscriberInterface
 {
     private $bearerToken;
-    private $callback;
 
-    public function __construct($bearerToken, $callback = null)
+    public function __construct($bearerToken)
     {
         $this->bearerToken = $bearerToken;
-        $this->callback = $callback;
     }
 
     public static function getSubscribedEvents()
@@ -31,15 +31,9 @@ class BearerAuth implements EventSubscriberInterface
 
     public function onRequestException(Event $event)
     {
-        if (401 === $event['response']->getStatusCode()) {
-            if (null !== $this->callback) {
-                $header = $event['response']->getHeader("WWW-Authenticate");
-                $reason = (1 === preg_match('/^Bearer.*?error="(.*?)".*$/', $header, $matches)) ? $matches[1] : "unknown";
-                if (false === call_user_func($this->callback, $reason)) {
-                    throw $event['exception'];
-                }
-            }
+        if (null !== $event['response']->getHeader("WWW-Authenticate")) {
+            throw BearerErrorResponseException::factory($event['request'], $event['response']);
         }
-        throw $event['exception'];
+        throw BadResponseException::factory($event['request'], $event['response']);
     }
 }

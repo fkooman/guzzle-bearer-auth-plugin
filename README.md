@@ -7,23 +7,28 @@ This is a Guzzle plugin to support Bearer Authentication as specified in RFC
     <?php
     require_once 'vendor/autoload.php';
 
-    use fkooman\Guzzle\Plugin\BearerAuth\BearerAuth;
     use Guzzle\Http\Client;
-    use Guzzle\Http\Exception\ClientErrorResponseException;
+    use fkooman\Guzzle\Plugin\BearerAuth\BearerAuth;
+    use fkooman\Guzzle\Plugin\BearerAuth\Exception\BearerErrorResponseException;
+    use Guzzle\Http\Exception\BadResponseException;
 
     try {
         $client = new Client();
 
-        $bearerAuth = new BearerAuth("12345", function($msg) {
-            echo $msg . PHP_EOL;
-            // delete the used token or mark it invalid before
-            // trying again
-        });
+        $bearerAuth = new BearerAuth("12345");
         $client->addSubscriber($bearerAuth);
-        $client->get('http://example.org/api')->send();
-    } catch (ClientErrorResponseException $e) {
-        // if it was a 401 we handled it in the callback
-        if(401 !== $e->getResponse()->getStatusCode()) {
-            echo $e->getMessage() . PHP_EOL;
-        }
+        $response = $client->get('http://api.example.org/resource')->send();
+        echo $response->getBody();
+    } catch (BearerErrorResponseException $e) {
+        echo $e->getMessage() . PHP_EOL;
+    } catch (BadResponseException $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
+
+# Exceptions
+The `BearerErrorResponseException` can be used to figure out what went wrong
+with the Bearer authentication. The reason is available using 
+`getBearerReason()`. The values are defined in RFC 6750 section 3.1, so either
+`invalid_request`, `invalid_token` or `insufficient_scope`. You can use this 
+to figure out what went wrong and e.g. remove the access token from your 
+storage or mark it as unusable.
