@@ -26,16 +26,16 @@ class BearerAuth implements EventSubscriberInterface
 
     public function onRequestBeforeSend(Event $event)
     {
-		if (!is_null($event) && !is_null($event['request'])) {
-       	 $event['request']->setHeader("Authorization", sprintf("Bearer %s", $this->bearerToken));
-		}
+        if (!is_null($event) && !is_null($event['request'])) {
+            $event['request']->setHeader("Authorization", sprintf("Bearer %s", $this->bearerToken));
+        }
     }
 
     public function onRequestException(Event $event)
     {
         if (!is_null($event)
-			&& !is_null($event['response'])
-			&& !is_null($event['response']->getHeader("WWW-Authenticate"))) {
+            && !is_null($event['response'])
+            && !is_null($event['response']->getHeader("WWW-Authenticate"))) {
             throw BearerErrorResponseException::factory($event['request'], $event['response']);
         }
         throw BadResponseException::factory($event['request'], $event['response']);

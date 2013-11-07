@@ -24,12 +24,14 @@ class BearerErrorResponseException extends ClientErrorResponseException
     {
         $label = 'Bearer error response';
         $bearerReason = self::headerToReason($response->getHeader("WWW-Authenticate"));
-        $message = $label . PHP_EOL . implode(PHP_EOL, array(
-            '[status code] ' . $response->getStatusCode(),
-            '[reason phrase] ' . $response->getReasonPhrase(),
-            '[bearer reason] ' . $bearerReason,
-            '[url] ' . $request->getUrl(),
-        ));
+        $message = $label . PHP_EOL . implode(PHP_EOL,
+            array(
+                '[status code] ' . $response->getStatusCode(),
+                '[reason phrase] ' . $response->getReasonPhrase(),
+                '[bearer reason] ' . $bearerReason,
+                '[url] ' . $request->getUrl(),
+            )
+        );
 
         $e = new static($message);
         $e->setResponse($response);
@@ -52,5 +54,4 @@ class BearerErrorResponseException extends ClientErrorResponseException
 
         return null;
     }
-
 }
