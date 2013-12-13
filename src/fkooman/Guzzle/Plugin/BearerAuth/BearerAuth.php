@@ -38,6 +38,5 @@ class BearerAuth implements EventSubscriberInterface
             && !is_null($event['response']->getHeader("WWW-Authenticate"))) {
             throw BearerErrorResponseException::factory($event['request'], $event['response']);
         }
-        throw BadResponseException::factory($event['request'], $event['response']);
     }
 }
