@@ -2,12 +2,14 @@
 
 namespace fkooman\Guzzle\Plugin\BearerAuth;
 
-use Guzzle\Common\Event;
-use Guzzle\Http\Exception\BadResponseException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use GuzzleHttp\Event\BeforeEvent;
+use GuzzleHttp\Event\CompleteEvent;
+use GuzzleHttp\Event\ErrorEvent;
+use GuzzleHttp\Event\EmitterInterface;
+use GuzzleHttp\Event\SubscriberInterface;
 use fkooman\Guzzle\Plugin\BearerAuth\Exception\BearerErrorResponseException;
 
-class BearerAuth implements EventSubscriberInterface
+class BearerAuth implements SubscriberInterface
 {
     private $bearerToken;
 
@@ -16,27 +18,28 @@ class BearerAuth implements EventSubscriberInterface
         $this->bearerToken = $bearerToken;
     }
 
-    public static function getSubscribedEvents()
+    public function getEvents()
     {
-        return array(
-            'request.before_send' => 'onRequestBeforeSend',
-            'request.exception' => 'onRequestException'
-        );
+        return [
+            'before' => ['onBefore', 100],
+            'error'  => ['onError']
+        ];
     }
 
-    public function onRequestBeforeSend(Event $event)
+    public function onBefore(BeforeEvent $event, $name)
     {
-        if (!is_null($event) && !is_null($event['request'])) {
-            $event['request']->setHeader("Authorization", sprintf("Bearer %s", $this->bearerToken));
+        if ($event !== null &&
+            $event->getRequest() !== null) {
+            $event->getRequest()->setHeader('Authorization', sprintf('Bearer %s', $this->bearerToken));
         }
     }
 
-    public function onRequestException(Event $event)
+    public function onError(ErrorEvent $event)
     {
-        if (!is_null($event)
-            && !is_null($event['response'])
-            && !is_null($event['response']->getHeader("WWW-Authenticate"))) {
-            throw BearerErrorResponseException::factory($event['request'], $event['response']);
+        if (!is_null($event) &&
+            $event->hasResponse() &&
+            $event->getResponse()->hasHeader('WWW-Authenticate')) {
+            throw BearerErrorResponseException::factory($event->getRequest(), $event->getResponse());
         }
     }
 }
