@@ -1,21 +1,21 @@
 {
+    "name": "fkooman/guzzle-bearer-auth-plugin",
+    "description": "Guzzle Bearer plugin",
+    "license": "MIT",
     "authors": [
         {
             "email": "fkooman@tuxed.net",
-            "name": "Fran\u00e7ois Kooman",
+            "name": "François Kooman",
             "role": "Developer"
         }
     ],
-    "autoload": {
-        "psr-0": {
-            "fkooman\\Guzzle\\Plugin\\BearerAuth": "src/"
-        }
-    },
-    "description": "Guzzle Bearer plugin",
-    "license": "MIT",
-    "name": "fkooman/guzzle-bearer-auth-plugin",
     "require": {
-        "guzzle/guzzle": ">=v3.7.0",
-        "php": ">=5.3.3"
+        "php": ">=5.4",
+        "guzzlehttp/guzzle": "~5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "fkooman\\Guzzle\\Plugin\\BearerAuth\\": "src/fkooman/Guzzle/Plugin/BearerAuth/"
+        }
     }
 }
