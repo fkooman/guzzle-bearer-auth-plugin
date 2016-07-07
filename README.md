@@ -4,26 +4,28 @@ This is a Guzzle plugin to support Bearer Authentication as specified in RFC
 
 # Example Use
 
-    <?php
-    require_once 'vendor/autoload.php';
+```php
+<?php
+require_once 'vendor/autoload.php';
 
-    use Guzzle\Http\Client;
-    use fkooman\Guzzle\Plugin\BearerAuth\BearerAuth;
-    use fkooman\Guzzle\Plugin\BearerAuth\Exception\BearerErrorResponseException;
-    use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Client;
+use fkooman\Guzzle\Plugin\BearerAuth\BearerAuth;
+use fkooman\Guzzle\Plugin\BearerAuth\Exception\BearerErrorResponseException;
+use Guzzle\Http\Exception\BadResponseException;
 
-    try {
-        $client = new Client();
+try {
+    $client = new Client();
 
-        $bearerAuth = new BearerAuth("12345");
-        $client->addSubscriber($bearerAuth);
-        $response = $client->get('http://api.example.org/resource')->send();
-        echo $response->getBody();
-    } catch (BearerErrorResponseException $e) {
-        echo $e->getMessage() . PHP_EOL;
-    } catch (BadResponseException $e) {
-        echo $e->getMessage() . PHP_EOL;
-    }
+    $bearerAuth = new BearerAuth("12345");
+    $client->addSubscriber($bearerAuth);
+    $response = $client->get('http://api.example.org/resource')->send();
+    echo $response->getBody();
+} catch (BearerErrorResponseException $e) {
+    echo $e->getMessage() . PHP_EOL;
+} catch (BadResponseException $e) {
+    echo $e->getMessage() . PHP_EOL;
+}
+```
 
 # Exceptions
 The `BearerErrorResponseException` can be used to figure out what went wrong
